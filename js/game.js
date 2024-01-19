@@ -14,7 +14,7 @@ window.addEventListener("keydown", (e) => {
     keyboard.LEFT = true;
   } else if (e.key === "ArrowDown") {
     keyboard.DOWN = true;
-  } else if (e.key === "ArrowUP") {
+  } else if (e.key === "ArrowUp") {
     keyboard.UP = true;
   } else if (e.key === " ") {
     keyboard.SPACE = true;
@@ -28,7 +28,7 @@ window.addEventListener("keyup", (e) => {
     keyboard.LEFT = false;
   } else if (e.key === "ArrowDown") {
     keyboard.DOWN = false;
-  } else if (e.key === "ArrowUP") {
+  } else if (e.key === "ArrowUp") {
     keyboard.UP = false;
   } else if (e.key === " ") {
     keyboard.SPACE = false;

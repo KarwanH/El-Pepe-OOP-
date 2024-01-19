@@ -8,6 +8,8 @@ class Character extends MoveAbleObject {
   y = 100;
   level_1 = level1;
   runningSound = new Audio("audio/running.mp3");
+  landingSound = new Audio("audio/landing.mp3");
+  currentSpeedY;
   // Array of image paths for walking animation
   IMAGES_WALKING = [
     "img/2_character_pepe/2_walk/W-21.png",
@@ -36,7 +38,8 @@ class Character extends MoveAbleObject {
     super().loadImg("img/2_character_pepe/2_walk/W-21.png");
     // Load the walking animation images
     this.loadImages(this.IMAGES_WALKING);
-    
+    this.loadImages(this.IMAGES_JUMPING);
+    this.applyGravity();
     // Start the animation loop
     this.animate();
   }
@@ -49,29 +52,37 @@ class Character extends MoveAbleObject {
       // Check if the right arrow key is pressed
       if (this.world.keyboard.RIGHT && this.x < this.level_1.level_end_x) {
         // Move the character to the right
-        this.x += this.speed;
-        this.otherDirection = false;
+        this.moveRight();
         this.runningSound.play();
-        
-        this.applyGravity();
+        this.otherDirection = false;
       }
       // Check if the left arrow key is pressed
       else if (this.world.keyboard.LEFT && this.x > 0) {
         // Move the character to the left
-        this.x -= this.speed;
-        this.otherDirection = true;
+        this.moveLeft();
         this.runningSound.play();
+        this.otherDirection = true;
+      }
+
+      if (
+        (this.world.keyboard.SPACE && !this.isAboveGround())
+      ) {
+        this.jump();
       }
       this.world.Camera_x = -this.x + 100;
     }, 25);
 
     setInterval(() => {
-      if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-        this.playAnimation();
+      if (this.isAboveGround()) {
+        this.playAnimation(this.IMAGES_JUMPING);
+        this.currentSpeedY = this.speedY;
+      } else {
+        if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+          this.playAnimation(this.IMAGES_WALKING);
+        }
       }
-    }, 25);
+    }, 60);
   }
 
   // Placeholder method for jumping (not implemented yet)
-  jump() {}
 }

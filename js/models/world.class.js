@@ -27,9 +27,8 @@ class World {
     this.ctx.translate(-this.Camera_x, 0);
 
     // Draw() wird immer wieder aufgerufen
-    let self = this;
-    requestAnimationFrame(function () {
-      self.draw();
+    requestAnimationFrame(() => {
+      this.draw();
     });
   }
 
@@ -41,13 +40,11 @@ class World {
 
   addToMap(mo) {
     if (mo.otherDirection) {
-      this.ctx.save();
-      this.ctx.translate(mo.x + mo.width, mo.y);
-      this.ctx.scale(-1, 1);
-      this.ctx.drawImage(mo.img, 0, 0, mo.width, mo.height);
-      this.ctx.restore();
+      mo.drawObject(this.ctx);
+      mo.drawFrame(this.ctx);
     } else {
-      this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
+      mo.draw(this.ctx);
+      mo.drawFrame(this.ctx);
     }
   }
 }

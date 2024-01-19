@@ -11,18 +11,18 @@ class MoveAbleObject {
   currentImage = 0; // the index of the current image
   otherDirection = false; // Default direction
   speedY = 0;
-  acceleration = 0.1;
+  acceleration = 1;
 
   applyGravity() {
     setInterval(() => {
-      if (this.isAboveGround()) {
-        this.speedY -= this.acceleration;
+      if (this.isAboveGround() || this.speedY > 0) {
         this.y -= this.speedY;
+        this.speedY -= this.acceleration;
       }
     }, 1000 / 25);
   }
 
-  isAboveGround(){
+  isAboveGround() {
     return this.y < 250;
   }
 
@@ -30,6 +30,26 @@ class MoveAbleObject {
   loadImg(path) {
     this.img = new Image();
     this.img.src = path;
+  }
+
+  draw(ctx) {
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+
+  drawFrame(ctx) {
+    ctx.beginPath();
+    ctx.lineWidth = "6";
+    ctx.strokeStyle = "red";
+    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.stroke();
+  }
+
+  drawObject(ctx) {
+    ctx.save();
+    ctx.translate(this.x + this.width, this.y);
+    ctx.scale(-1, 1);
+    ctx.drawImage(this.img, 0, 0, this.width, this.height);
+    ctx.restore();
   }
 
   // Method to load multiple images from an array of paths
@@ -43,20 +63,21 @@ class MoveAbleObject {
     });
   }
 
-  playAnimation() {
-    let path =
-      this.IMAGES_WALKING[this.currentImage % this.IMAGES_WALKING.length];
+  playAnimation(images) {
+    let path = images[this.currentImage % this.IMAGES_WALKING.length];
     this.img = this.imageCache[path];
     this.currentImage++;
   }
 
-  // Placeholder method for moving the object to the right
-  moveRight() {
-    // To be implemented
+  jump() {
+    this.speedY = 15;
   }
 
-  // Placeholder method for moving the object to the left
   moveLeft() {
-    // To be implemented
+    this.x -= this.speed;
+  }
+
+  moveRight() {
+    this.x += this.speed;
   }
 }

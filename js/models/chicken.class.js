@@ -17,12 +17,12 @@ class Chicken extends MoveAbleObject {
 
   animate() {
     setInterval(() => {
-      this.playAnimation();
-      this.moveCharacter();
+      this.playAnimation(this.IMAGES_WALKING);
+      this.moveChicken();
     }, 1000);
   }
 
-  moveCharacter() {
+  moveChicken() {
     this.x -= 5;
   }
 }

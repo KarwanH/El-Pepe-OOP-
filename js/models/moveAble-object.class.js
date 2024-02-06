@@ -1,17 +1,14 @@
 // Define a class named MoveAbleObject
-class MoveAbleObject {
+class MoveAbleObject extends DrawableObject {
   // Initialize default values for position and dimensions
-  x = 120;
-  y = 250;
+
   speed = 0.15;
-  img; // Will hold the Image object
-  height = 150;
-  width = 100;
-  imageCache = {}; // Cache to store loaded images
-  currentImage = 0; // the index of the current image
   otherDirection = false; // Default direction
   speedY = 0;
   acceleration = 1;
+  energy = 100;
+  lastHit = 0;
+  coins = 0;
 
   applyGravity() {
     setInterval(() => {
@@ -21,27 +18,37 @@ class MoveAbleObject {
       }
     }, 1000 / 25);
   }
-
   isAboveGround() {
     return this.y < 250;
   }
 
-  // Method to load a single image from the specified path
-  loadImg(path) {
-    this.img = new Image();
-    this.img.src = path;
+  // character.isColliding(chicken)
+  isColliding(mo) {
+    return (
+      this.x + this.width > mo.x &&
+      this.y + this.height > mo.y &&
+      this.x < mo.x &&
+      this.y < mo.y + mo.height
+    );
   }
 
-  draw(ctx) {
-    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  hit() {
+    this.energy -= 5;
+    if (this.energy <= 0) {
+      this.energy = 0;
+    } else {
+      this.lastHit = new Date().getTime();
+    }
   }
 
-  drawFrame(ctx) {
-    ctx.beginPath();
-    ctx.lineWidth = "6";
-    ctx.strokeStyle = "red";
-    ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.stroke();
+  isHurt() {
+    let timePassed = new Date().getTime() - this.lastHit; // Difference in ms
+    timePassed = timePassed / 1000; //Difference in s;
+    return timePassed < 0.5;
+  }
+
+  isDead() {
+    return this.energy == 0;
   }
 
   drawObject(ctx) {
@@ -52,19 +59,8 @@ class MoveAbleObject {
     ctx.restore();
   }
 
-  // Method to load multiple images from an array of paths
-  loadImages(arr) {
-    arr.forEach((path) => {
-      // Create a new Image object for each path
-      let img = new Image();
-      img.src = path;
-      // Store the Image object in the image cache using the path as the key
-      this.imageCache[path] = img;
-    });
-  }
-
   playAnimation(images) {
-    let path = images[this.currentImage % this.IMAGES_WALKING.length];
+    let path = images[this.currentImage % images.length];
     this.img = this.imageCache[path];
     this.currentImage++;
   }

@@ -2,6 +2,7 @@
 let canvas;
 let world;
 let keyboard = new Keyboard();
+let keyPress = false;
 function init() {
   canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
@@ -18,6 +19,9 @@ window.addEventListener("keydown", (e) => {
     keyboard.UP = true;
   } else if (e.key === " ") {
     keyboard.SPACE = true;
+  } else if (e.code === "KeyD" && !keyPress) {
+    keyboard.D = true;
+    keyPress = true;
   }
 });
 
@@ -32,5 +36,9 @@ window.addEventListener("keyup", (e) => {
     keyboard.UP = false;
   } else if (e.key === " ") {
     keyboard.SPACE = false;
+  } else if (e.code === "KeyD") {
+    keyboard.D = false;
+    keyPress = false;
   }
 });
+

@@ -25,11 +25,15 @@ class DrawableObject {
       img.src = path;
       // Store the Image object in the image cache using the path as the key
       this.imageCache[path] = img;
+      
     });
   }
 
   drawFrame(ctx) {
-    if (this instanceof Chicken || this instanceof Character) {
+    if (
+      this instanceof Chicken ||
+      this instanceof Character 
+     ) {
       ctx.beginPath();
       ctx.lineWidth = "6";
       ctx.strokeStyle = "red";

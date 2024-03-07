@@ -1,86 +1,96 @@
-// Definition of the Character class, extending the MoveAbleObject class
+/**
+ * Class representing a character that extends the MoveAbleObject class.
+ */
 class Character extends MoveAbleObject {
-  // Default height and width values for the character
+  /**
+   * Default height of the character.
+   * @type {number}
+   */
   height = 200;
+
+  /**
+   * Default width of the character.
+   * @type {number}
+   */
   width = 100;
-  speed = 10; // Speed of the character's movement
+
+  /**
+   * X-coordinate of the character.
+   * @type {number}
+   */
   x = 0;
+
+  /**
+   * Y-coordinate of the character.
+   * @type {number}
+   */
   y = 100;
+
+  /**
+   * Cache object for character.
+   * @type {CharacterCache}
+   */
+  cache = new CharacterCache();
+
+  /**
+   * Level object for character.
+   * @type {Level}
+   */
   level_1 = level1;
+
+  /**
+   * Audio object for hurt sound.
+   * @type {Audio}
+   */
+  hurtSound = new Audio("audio/hurt.mp3");
+
+  /**
+   * Audio object for running sound.
+   * @type {Audio}
+   */
   runningSound = new Audio("audio/running.mp3");
+
+  /**
+   * Audio object for landing sound.
+   * @type {Audio}
+   */
   landingSound = new Audio("audio/landing.mp3");
+
+  /**
+   * Current speed of character in Y-direction.
+   * @type {number}
+   */
   currentSpeedY;
-  // Array of image paths for walking animation
-  IMAGES_WALKING = [
-    "img/2_character_pepe/2_walk/W-21.png",
-    "img/2_character_pepe/2_walk/W-22.png",
-    "img/2_character_pepe/2_walk/W-23.png",
-    "img/2_character_pepe/2_walk/W-24.png",
-    "img/2_character_pepe/2_walk/W-25.png",
-    "img/2_character_pepe/2_walk/W-26.png",
-  ];
 
-  IMAGES_JUMPING = [
-    "img/2_character_pepe/3_jump/J-31.png",
-    "img/2_character_pepe/3_jump/J-32.png",
-    "img/2_character_pepe/3_jump/J-33.png",
-    "img/2_character_pepe/3_jump/J-34.png",
-    "img/2_character_pepe/3_jump/J-35.png",
-    "img/2_character_pepe/3_jump/J-36.png",
-    "img/2_character_pepe/3_jump/J-37.png",
-    "img/2_character_pepe/3_jump/J-38.png",
-    "img/2_character_pepe/3_jump/J-39.png",
-  ];
-
-  IMAGES_DEAD = [
-    "img/2_character_pepe/5_dead/D-51.png",
-    "img/2_character_pepe/5_dead/D-52.png",
-    "img/2_character_pepe/5_dead/D-53.png",
-    "img/2_character_pepe/5_dead/D-54.png",
-    "img/2_character_pepe/5_dead/D-55.png",
-    "img/2_character_pepe/5_dead/D-56.png",
-    "img/2_character_pepe/5_dead/D-57.png",
-  ];
-
-  IMAGES_HURT = [
-    "img/2_character_pepe/4_hurt/H-41.png",
-    "img/2_character_pepe/4_hurt/H-42.png",
-    "img/2_character_pepe/4_hurt/H-43.png",
-  ];
-  // Constructor method to initialize the character
+  /**
+   * Constructor method to initialize the character.
+   */
   constructor() {
-    // Call the constructor of the parent class and load the initial image
     super().loadImg("img/2_character_pepe/2_walk/W-21.png");
-    // Load the walking animation images
-    this.loadImages(this.IMAGES_WALKING);
-    this.loadImages(this.IMAGES_JUMPING);
-    this.loadImages(this.IMAGES_DEAD);
-    this.loadImages(this.IMAGES_HURT);
+    this.loadImages(this.cache.IMAGES_WALKING);
+    this.loadImages(this.cache.IMAGES_JUMPING);
+    this.loadImages(this.cache.IMAGES_DEAD);
+    this.loadImages(this.cache.IMAGES_INPAIN);
     this.applyGravity();
-    // Start the animation loop
     this.animate();
+    this.groundHeight = 250;
   }
 
-  // Method to handle the animation and movement of the character
+  /**
+   * Method to handle the animation and movement of the character.
+   */
   animate() {
-    // Set up an interval for the animation loop
     setInterval(() => {
       this.runningSound.pause();
-      // Check if the right arrow key is pressed
       if (this.world.keyboard.RIGHT && this.x < this.level_1.level_end_x) {
-        // Move the character to the right
         this.moveRight();
-        this.runningSound.play();
+        this.playWalkingSound();
         this.otherDirection = false;
-      }
-      // Check if the left arrow key is pressed
-      else if (this.world.keyboard.LEFT && this.x > 0) {
-        // Move the character to the left
+      } else if (this.world.keyboard.LEFT && this.x > 0) {
+        this.playWalkingSound();
         this.moveLeft();
-        this.runningSound.play();
         this.otherDirection = true;
       }
-
       if (this.world.keyboard.SPACE && !this.isAboveGround()) {
         this.jump();
       }
@@ -89,19 +99,26 @@ class Character extends MoveAbleObject {
 
     setInterval(() => {
       if (this.isDead()) {
-        this.playAnimation(this.IMAGES_DEAD);
+        this.playAnimation(this.cache.IMAGES_DEAD);
+        this.disApear();
       } else if (this.isHurt()) {
-        this.playAnimation(this.IMAGES_HURT)
+        this.playAnimation(this.cache.IMAGES_INPAIN);
       } else if (this.isAboveGround()) {
-        this.playAnimation(this.IMAGES_JUMPING);
-        this.currentSpeedY = this.speedY;
+        this.playAnimation(this.cache.IMAGES_JUMPING);
+      } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+        this.playAnimation(this.cache.IMAGES_WALKING);
       } else {
-        if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-          this.playAnimation(this.IMAGES_WALKING);
-        }
+        super.loadImg("img/2_character_pepe/1_idle/idle/I-1.png");
       }
     }, 60);
   }
 
-  // Placeholder method for jumping (not implemented yet)
+  /**
+   * Plays walking sound if character is not above ground.
+   */
+  playWalkingSound() {
+    if (!this.isAboveGround()) {
+      this.runningSound.play();
+    }
+  }
 }
